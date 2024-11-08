@@ -24,7 +24,7 @@ public class ParkingSystem {
                 " from Gate "+car.getGateId()+
                 " parked. (Parking Status: " + (spots - semaphoreSpots.availablePermits())+
                 "spots occupied)");
-
+        // wait specific time
         Thread.sleep(car.getDurationTime());
 
         System.out.println("Car "+ car.getCarId()+
