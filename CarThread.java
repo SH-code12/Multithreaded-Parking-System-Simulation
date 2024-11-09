@@ -1,11 +1,13 @@
+// Shahd Elnassag ^_^
 // Car is a Thread
 public class CarThread extends Thread{
-    private  int carId;
-    private int arriveTime;
-    private int durationTime;
-    private int gateId;
-    private ParkingSystem parkingSystem;
-
+    private final int carId;
+    private final int arriveTime;
+    private final int durationTime;
+    private final int gateId;
+    private final ParkingSystem parkingSystem;
+    private long parkingTime;
+    private long arriveTimeMillis;
     // Constructor
     public CarThread(int gateId, int carId, int arriveTime, int durationTime, ParkingSystem parkingSystem) {
         this.carId = carId;
@@ -13,51 +15,55 @@ public class CarThread extends Thread{
         this.durationTime = durationTime;
         this.gateId = gateId;
         this.parkingSystem = parkingSystem;
+        this.arriveTimeMillis = System.currentTimeMillis() + (arriveTime * 1000L);
     }
-
-    // Setter and getters
 
     public int getCarId() {
         return carId;
-    }
-    public void setCarId(int carId) {
-        this.carId = carId;
-    }
-
-    public int getArriveTime() {
-        return arriveTime;
-    }
-    public void setArriveTime(int arriveTime) {
-        this.arriveTime = arriveTime;
-    }
-
-    public int getDurationTime() {
-        return durationTime;
-    }
-    public void setDurationTime(int durationTime) {
-        this.durationTime = durationTime;
     }
 
     public int getGateId() {
         return gateId;
     }
-    public void setGateId(int gateId) {
-        this.gateId = gateId;
+    public long getParkingTime() {
+        return parkingTime;
     }
+
+    public long getArriveTimeMillis() {
+        return arriveTimeMillis;
+    }
+
+
+    public void setParkingTime(long parkingTime) {
+        this.parkingTime = parkingTime;
+    }
+
 
     @Override
     public void run(){
 
-        // another try not sure
         try {
-            Thread.sleep(arriveTime);
+            long currentTime = System.currentTimeMillis();
+            long waitTime = arriveTimeMillis - currentTime;
+            if (waitTime > 0) {
+                // Sleep for the remaining time until car arrives
+                Thread.sleep(waitTime);
+            }
+            System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arriveTime);
+
+
             if(!parkingSystem.isFull()){
                 parkingSystem.park(this);
+                parkingTime = System.currentTimeMillis();
 
+                Thread.sleep(durationTime * 1000L);
+                parkingSystem.leave(this);
+            }else {
+                System.out.println("Car " + carId + " from Gate " + gateId + " waiting for a spot.");
             }
         } catch (InterruptedException e) {
             System.out.println("Car " + carId + " Cause an error occured.");
-            throw new RuntimeException(e);
+            e.printStackTrace();
 
         }
 

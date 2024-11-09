@@ -1,0 +1,19 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# Ignore JetBrains IDE project files
+.idea/
+*.iml
+C:\Users\DELL\Desktop\SHaHD\3th_first term\Operating_System\simulator_1\.idea\misc.xml
+C:\Users\DELL\Desktop\SHaHD\3th_first term\Operating_System\simulator_1\.idea\modules.xml
+C:\Users\DELL\Desktop\SHaHD\3th_first term\Operating_System\simulator_1\.idea\vcs.xml
+C:\Users\DELL\Desktop\SHaHD\3th_first term\Operating_System\simulator_1\.idea\workspace.xml
+C:\Users\DELL\Desktop\SHaHD\3th_first term\Operating_System\simulator_1\simulator_1.iml
+C:\Users\DELL\Desktop\SHaHD\3th_first term\Operating_System\simulator_1\.idea
+

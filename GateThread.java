@@ -1,3 +1,5 @@
+// Shahd Elnassag ^_^
+// Gate is a Thread
 import java.util.List;
 
 // Gate is a Thread
