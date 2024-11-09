@@ -7,7 +7,7 @@ public class CarThread extends Thread{
     private ParkingSystem parkingSystem;
 
     // Constructor
-    public CarThread(int carId, int arriveTime, int durationTime,int gateId, ParkingSystem parkingSystem) {
+    public CarThread(int gateId, int carId, int arriveTime, int durationTime, ParkingSystem parkingSystem) {
         this.carId = carId;
         this.arriveTime = arriveTime;
         this.durationTime = durationTime;
@@ -49,6 +49,18 @@ public class CarThread extends Thread{
     public void run(){
 
         System.out.println("Will add CarThread Implementation Soon God Willing ^_^ ");
+        // another try not sure
+        try {
+            Thread.sleep(arriveTime);
+            if(!parkingSystem.isFull()){
+                parkingSystem.park(this);
+                System.out.println("Car "+ carId + " from Gate "+ gateId +" arrived at time "+arriveTime);
+
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 

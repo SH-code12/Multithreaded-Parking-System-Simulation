@@ -16,6 +16,7 @@ public class GateThread extends Thread {
         System.out.println("Will add GateThread Implementation Soon God Willing ^_^ ");
         // try not sure at all
         for (CarThread car : cars) {
+            // start execution
             car.start();
         }
 
