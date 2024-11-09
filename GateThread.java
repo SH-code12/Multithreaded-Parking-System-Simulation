@@ -4,20 +4,27 @@ import java.util.List;
 public class GateThread extends Thread {
 
     private List<CarThread> cars;
-    private ParkingSystem parkingSystem;
 
     // Constructor
-    public GateThread(List<CarThread> cars, ParkingSystem parkingSystem) {
+    public GateThread(List<CarThread> cars) {
         this.cars = cars;
-        this.parkingSystem = parkingSystem;
     }
 
     public void run() {
-        System.out.println("Will add GateThread Implementation Soon God Willing ^_^ ");
-        // try not sure at all
+        // start execution
         for (CarThread car : cars) {
             // start execution
             car.start();
+        }
+        // wait till end list of cars
+        for (CarThread car : cars) {
+            // start execution
+            try {
+                car.join();
+            } catch (InterruptedException e) {
+                System.out.println("Error with run in GateThread class ");
+                throw new RuntimeException(e);
+            }
         }
 
     }
