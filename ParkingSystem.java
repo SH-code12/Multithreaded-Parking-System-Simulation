@@ -17,25 +17,39 @@ public class ParkingSystem {
     }
 
     public void park(CarThread car) throws InterruptedException {
-        // car wait to park
+        // Log arrival
+        System.out.println("Car " + car.getCarId() +
+                " from Gate " + car.getGateId() +
+                " arrived at time " + car.getArriveTime());
+
+        if (isFull()) {
+            System.out.println("Car " + car.getCarId() +
+                    " from Gate " + car.getGateId() +
+                    " waiting for a spot.");
+        }
+
+        // Acquire a parking spot
         semaphoreSpots.acquire();
 
-        System.out.println("Car "+ car.getCarId()+
-                " from Gate "+car.getGateId()+
-                " parked. (Parking Status: " + (spots - semaphoreSpots.availablePermits())+
-                "spots occupied)");
-        // wait specific time
+        // Log parking status after parking
+        System.out.println("Car " + car.getCarId() +
+                " from Gate " + car.getGateId() +
+                " parked. (Parking Status: " + (spots - semaphoreSpots.availablePermits()) +
+                " spots occupied)");
+
+        // Car stays in parking
         Thread.sleep(car.getDurationTime());
 
-        System.out.println("Car "+ car.getCarId()+
-                " from Gate "+car.getGateId()+
-                " left. (Parking Status: " + (spots - semaphoreSpots.availablePermits())+
-                "spots occupied)");
+        // Log exit  and update status
+        System.out.println("Car " + car.getCarId() +
+                " from Gate " + car.getGateId() +
+                " left after " + car.getDurationTime() + " units of time. (Parking Status: " +
+                (spots - semaphoreSpots.availablePermits() - 1) + " spots occupied)");
 
-        // method to return permits after exiting the critical section
+        // Release the parking spot
         semaphoreSpots.release();
-
     }
+
 
 
 

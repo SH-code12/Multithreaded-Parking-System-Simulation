@@ -48,17 +48,17 @@ public class CarThread extends Thread{
     @Override
     public void run(){
 
-        System.out.println("Will add CarThread Implementation Soon God Willing ^_^ ");
         // another try not sure
         try {
             Thread.sleep(arriveTime);
             if(!parkingSystem.isFull()){
                 parkingSystem.park(this);
-                System.out.println("Car "+ carId + " from Gate "+ gateId +" arrived at time "+arriveTime);
 
             }
         } catch (InterruptedException e) {
+            System.out.println("Car " + carId + " Cause an error occured.");
             throw new RuntimeException(e);
+
         }
 
 
