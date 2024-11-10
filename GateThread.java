@@ -8,8 +8,8 @@ public class GateThread extends Thread {
     private List<CarThread> cars;
 
     // Constructor
-    public GateThread(List<CarThread> cars) {
-        this.cars = cars;
+    public GateThread(List<CarThread> carss) {
+        cars = carss;
     }
 
     public void run() {

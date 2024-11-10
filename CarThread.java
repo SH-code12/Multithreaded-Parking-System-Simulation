@@ -6,6 +6,7 @@ public class CarThread extends Thread{
     private final int durationTime;
     private final int gateId;
     private final ParkingSystem parkingSystem;
+
     private long parkingTime;
     private long arriveTimeMillis;
     // Constructor
@@ -47,20 +48,20 @@ public class CarThread extends Thread{
             long waitTime = arriveTimeMillis - currentTime;
             if (waitTime > 0) {
                 // Sleep for the remaining time until car arrives
+
                 Thread.sleep(waitTime);
             }
             System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arriveTime);
-
-
-            if(!parkingSystem.isFull()){
-                parkingSystem.park(this);
-                parkingTime = System.currentTimeMillis();
-
-                Thread.sleep(durationTime * 1000L);
-                parkingSystem.leave(this);
-            }else {
-                System.out.println("Car " + carId + " from Gate " + gateId + " waiting for a spot.");
+            synchronized (parkingSystem) {
+                ParkingSystem.queue.add(this);
             }
+if(parkingSystem.isFull())
+    System.out.println("Car " + carId + " from Gate " + gateId + " waiting for a spot.");
+    parkingSystem.park(this);
+    parkingTime = System.currentTimeMillis();
+    Thread.sleep(durationTime * 1000L);
+    parkingSystem.leave(this);
+
         } catch (InterruptedException e) {
             System.out.println("Car " + carId + " Cause an error occured.");
             e.printStackTrace();

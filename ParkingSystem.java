@@ -1,12 +1,17 @@
 // Shahd Elnassag ^_^
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
+
+
 
 public class ParkingSystem {
 
     private final int  spots;
     private final Semaphore semaphoreSpots;
-    private int currentCarsInSpots = 0;
+    public static final BlockingQueue<CarThread> queue = new LinkedBlockingQueue<>();
+    private volatile int currentCarsInSpots = 0;
 
     public ParkingSystem(int spots) {
         this.spots = spots;
@@ -24,21 +29,25 @@ public class ParkingSystem {
     }
 
     public void park(CarThread car) throws InterruptedException {
-        long waitTime = System.currentTimeMillis() - car.getArriveTimeMillis();
+        car = queue.take();
+        long waitTime = (System.currentTimeMillis() - car.getArriveTimeMillis() ) ;
         semaphoreSpots.acquire();
         currentCarsInSpots++;
         car.setParkingTime(System.currentTimeMillis());
-        System.out.println("Car " + car.getCarId() + " from Gate " + car.getGateId() +
-                " parked after waiting for " + (waitTime/1000)+
-                " units of time. (Parking Status: " + currentCarsInSpots + " spots occupied)");
+            System.out.println("Car " + car.getCarId() + " from Gate " + car.getGateId() +
+                    " parked after waiting for " + (waitTime / 1000L) +
+                    " units of time. (Parking Status: " + currentCarsInSpots + " spots occupied)");
+
+
     }
 
-    public void leave(CarThread car) {
-        long parkDuration = (System.currentTimeMillis() - car.getParkingTime()) / 1000;
-        semaphoreSpots.release();
-        currentCarsInSpots--;
-        System.out.println("Car " + car.getCarId() + " from Gate " + car.getGateId() + " left after " +parkDuration+
-                " units of time. (Parking Status: " + currentCarsInSpots + " spots occupied)");
+    public void leave(CarThread car)  {
+        long parkDuration = (System.currentTimeMillis() - car.getParkingTime()) / 1000L;
+            currentCarsInSpots--;
+                System.out.println("Car " + car.getCarId() + " leaved from Gate " + car.getGateId() + " left after " + parkDuration +
+                        " units of time. (Parking Status: " + currentCarsInSpots + " spots occupied)");
+            semaphoreSpots.release();
+
     }
 
 
