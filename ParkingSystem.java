@@ -30,12 +30,17 @@ public class ParkingSystem {
 
     public void park(CarThread car) throws InterruptedException {
         car = queue.take();
-        long waitTime = (System.currentTimeMillis() - car.getArriveTimeMillis() ) ;
+
+        long waitTime = (System.currentTimeMillis() - car.getQueueWaitStart()) / 1000L;
+
         semaphoreSpots.acquire();
+
         currentCarsInSpots++;
+
         car.setParkingTime(System.currentTimeMillis());
-            System.out.println("Car " + car.getCarId() + " from Gate " + car.getGateId() +
-                    " parked after waiting for " + (waitTime / 1000L) +
+
+        System.out.println("Car " + car.getCarId() + " from Gate " + car.getGateId() +
+                    " parked after waiting for " + waitTime +
                     " units of time. (Parking Status: " + currentCarsInSpots + " spots occupied)");
 
 
@@ -43,10 +48,12 @@ public class ParkingSystem {
 
     public void leave(CarThread car)  {
         long parkDuration = (System.currentTimeMillis() - car.getParkingTime()) / 1000L;
-            currentCarsInSpots--;
-                System.out.println("Car " + car.getCarId() + " leaved from Gate " + car.getGateId() + " left after " + parkDuration +
+
+        currentCarsInSpots--;
+
+        System.out.println("Car " + car.getCarId() + " from Gate " + car.getGateId() + " left after " + parkDuration +
                         " units of time. (Parking Status: " + currentCarsInSpots + " spots occupied)");
-            semaphoreSpots.release();
+        semaphoreSpots.release();
 
     }
 
