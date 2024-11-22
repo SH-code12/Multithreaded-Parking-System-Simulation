@@ -6,12 +6,13 @@ import java.util.concurrent.Semaphore;
 
 
 
+
 public class ParkingSystem {
 
     private final int  spots;
     private final Semaphore semaphoreSpots;
     public static final BlockingQueue<CarThread> queue = new LinkedBlockingQueue<>();
-    private volatile int currentCarsInSpots = 0;
+    private int currentCarsInSpots = 0;
 
     public ParkingSystem(int spots) {
         this.spots = spots;
@@ -42,12 +43,13 @@ public class ParkingSystem {
     }
 
     public void leave(CarThread car)  {
-        long parkDuration = (System.currentTimeMillis() - car.getParkingTime()) / 1000L;
-            currentCarsInSpots--;
+            long parkDuration = (System.currentTimeMillis() - car.getParkingTime()) / 1000L;
+            synchronized (this) {
+                currentCarsInSpots--;
                 System.out.println("Car " + car.getCarId() + " leaved from Gate " + car.getGateId() + " left after " + parkDuration +
                         " units of time. (Parking Status: " + currentCarsInSpots + " spots occupied)");
-            semaphoreSpots.release();
-
+                semaphoreSpots.release();
+            }
     }
 
 

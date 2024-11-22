@@ -31,7 +31,7 @@ public class CarThread extends Thread{
     }
 
     public long getArriveTimeMillis() {
-        return arriveTimeMillis;
+        return arriveTimeMillis  ;
     }
 
 
@@ -51,16 +51,23 @@ public class CarThread extends Thread{
 
                 Thread.sleep(waitTime);
             }
-            System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arriveTime);
+            boolean f =false;
             synchronized (parkingSystem) {
+                System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arriveTime);
                 ParkingSystem.queue.add(this);
+                if (parkingSystem.isFull()) {
+                    System.out.println("Car " + carId + " from Gate " + gateId + " waiting for a spot.");
+                    f = true;
+                }
+                else
+                    parkingSystem.park(this);
             }
-if(parkingSystem.isFull())
-    System.out.println("Car " + carId + " from Gate " + gateId + " waiting for a spot.");
-    parkingSystem.park(this);
+            if(f)parkingSystem.park(this);
     parkingTime = System.currentTimeMillis();
     Thread.sleep(durationTime * 1000L);
-    parkingSystem.leave(this);
+
+        parkingSystem.leave(this);
+
 
         } catch (InterruptedException e) {
             System.out.println("Car " + carId + " Cause an error occured.");
