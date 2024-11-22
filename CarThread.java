@@ -1,24 +1,20 @@
-// Shahd Elnassag ^_^
-// Car is a Thread
-public class CarThread extends Thread{
+public class CarThread extends Thread {
     private final int carId;
-    private final int arriveTime;
-    private final int durationTime;
     private final int gateId;
+    private final int arrivalTime;  // Arrival time in seconds
+    private final int parkingDuration; // Parking duration in seconds
     private final ParkingSystem parkingSystem;
 
-    private long parkingTime;
-    private long arriveTimeMillis;
-    private long queueWaitStart;
+    private long waitTime;
+    private long queueWaitStartTime;
+    private long parkingStartTime;
 
-    // Constructor
-    public CarThread(int gateId, int carId, int arriveTime, int durationTime, ParkingSystem parkingSystem) {
+    public CarThread(int gateId, int carId, int arrivalTime, int parkingDuration, ParkingSystem parkingSystem) {
         this.carId = carId;
-        this.arriveTime = arriveTime;
-        this.durationTime = durationTime;
         this.gateId = gateId;
+        this.arrivalTime = arrivalTime;
+        this.parkingDuration = parkingDuration;
         this.parkingSystem = parkingSystem;
-        this.arriveTimeMillis = System.currentTimeMillis() + (arriveTime * 1000L);
     }
 
     public int getCarId() {
@@ -28,86 +24,51 @@ public class CarThread extends Thread{
     public int getGateId() {
         return gateId;
     }
-    public long getParkingTime() {
-        return parkingTime;
+
+    public void setParkingStartTime(long parkingStartTime) {
+        this.parkingStartTime = parkingStartTime;
     }
 
-
-    public long getQueueWaitStart() {
-        return queueWaitStart;
+    public long getParkingStartTime() {
+        return parkingStartTime;
     }
 
-
-    public void setParkingTime(long parkingTime) {
-        this.parkingTime = parkingTime;
+    public long getQueueWaitStartTime() {
+        return queueWaitStartTime;
     }
-
 
     @Override
-    public void run(){
-
+    public void run() {
         try {
-            long currentTime = System.currentTimeMillis();
-            long waitTime = arriveTimeMillis - currentTime;
+            // Simulate car arrival time
+            Thread.sleep(arrivalTime * 1000L);
+            System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arrivalTime);
+
+            // Record queue wait start time
+            queueWaitStartTime = System.currentTimeMillis();
+
+            // Add car to the queue
+            parkingSystem.queue.put(this);
+
+            // Attempt to park once the car gets a spot
+            parkingSystem.park(this);
+
+            // Calculate and log the waiting time
+            waitTime = (System.currentTimeMillis() - queueWaitStartTime) / 1000L;
             if (waitTime > 0) {
-                // Sleep for the remaining time until car arrives
-
-                Thread.sleep(waitTime);
-            }
-            System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arriveTime);
-            // Record when the car starts waiting in the queue
-            this.queueWaitStart = System.currentTimeMillis();
-            // Add to the queue
-//            ParkingSystem.queue.add(this);
-            boolean f =false;
-            synchronized (parkingSystem) {
-                System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arriveTime);
-
-                this.queueWaitStart = System.currentTimeMillis();
-                ParkingSystem.queue.add(this);
-                if (parkingSystem.isFull()) {
-                    System.out.println("Car " + carId + " from Gate " + gateId + " waiting for a spot.");
-                    f = true;
-                }
-                else
-                    parkingSystem.park(this);
-            }
-            if(f)parkingSystem.park(this);
-    parkingTime = System.currentTimeMillis();
-    Thread.sleep(durationTime * 1000L);
-
-        parkingSystem.leave(this);
-
-
-                // Wait if parking is full
-                while (parkingSystem.isFull()) {
-                    System.out.println("Car " + carId + " from Gate " + gateId + " waiting for a spot.");
-                    parkingSystem.wait();
-                }
-                // Park the car
-                parkingSystem.park(this);
-                parkingTime = System.currentTimeMillis();
+                System.out.println("Car " + carId + " from Gate " + gateId + " parked after waiting for " +
+                        waitTime + " units of time.");
             }
 
-            // Car stays parked for the specified duration
-            Thread.sleep(durationTime * 1000L);
+            // Simulate parking duration
+            Thread.sleep(parkingDuration * 1000L);
 
-            // Car leaves the parking
-            synchronized (parkingSystem) {
-                parkingSystem.leave(this);
-//                System.out.println("Car " + carId + " left the parking.");
-                parkingSystem.notifyAll();
-            }
-
+            // Leave the parking spot
+            parkingSystem.leave(this);
 
         } catch (InterruptedException e) {
-            System.out.println("Car " + carId + " Cause an error occured.");
-            e.printStackTrace();
-
+            System.err.println("Car " + carId + " from Gate " + gateId + " encountered an error.");
+            Thread.currentThread().interrupt();
         }
-
-
     }
-
-
 }

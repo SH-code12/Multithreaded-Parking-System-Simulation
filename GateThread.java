@@ -1,35 +1,27 @@
-// Shahd Elnassag ^_^
-// Gate is a Thread
 import java.util.List;
 
-// Gate is a Thread
 public class GateThread extends Thread {
+    private final List<CarThread> cars;
 
-    private List<CarThread> cars;
-
-    // Constructor
-    public GateThread(List<CarThread> carss) {
-        cars = carss;
+    public GateThread(List<CarThread> cars) {
+        this.cars = cars;
     }
 
+    @Override
     public void run() {
-        // start execution
+
         for (CarThread car : cars) {
-            // start execution
+            // Start each car thread
             car.start();
         }
-        // wait till end list of cars
         for (CarThread car : cars) {
-            // start execution
             try {
+                // Wait for all cars to finish
                 car.join();
             } catch (InterruptedException e) {
-                System.out.println("Error with run in GateThread class ");
-                throw new RuntimeException(e);
+                System.err.println("Gate " + car.getGateId() + " encountered an error.");
+                Thread.currentThread().interrupt();
             }
         }
-
     }
-
 }
-

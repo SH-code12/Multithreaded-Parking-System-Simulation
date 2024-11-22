@@ -1,63 +1,61 @@
-// Shahd Elnassag ^_^
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
-
-
-
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ParkingSystem {
 
-    private final int  spots;
+    private final int spots;
     private final Semaphore semaphoreSpots;
     public static final BlockingQueue<CarThread> queue = new LinkedBlockingQueue<>();
-    private int currentCarsInSpots = 0;
+    private final AtomicInteger currentCarsInSpots = new AtomicInteger(0);
 
     public ParkingSystem(int spots) {
         this.spots = spots;
-        // intialize
-        this.semaphoreSpots = new Semaphore(spots);
+        this.semaphoreSpots = new Semaphore(spots, true);
     }
 
-    public int getCurrentCars(){
-        return currentCarsInSpots;
+    public int getCurrentCars() {
+        return currentCarsInSpots.get();
     }
 
-    // check if there is spots free
-    public boolean isFull(){
-        return semaphoreSpots.availablePermits() == 0;
+    // Log the current parking status
+    private synchronized void logParkingStatus(String message) {
+        System.out.println(message + " (Parking Status: " + currentCarsInSpots.get() + " spots occupied)");
     }
 
     public void park(CarThread car) throws InterruptedException {
-        car = queue.take();
-
-        long waitTime = (System.currentTimeMillis() - car.getQueueWaitStart()) / 1000L;
-
+        // Wait for an available parking spot
         semaphoreSpots.acquire();
 
-        currentCarsInSpots++;
+        // Update the parking status
+        currentCarsInSpots.incrementAndGet();
 
-        car.setParkingTime(System.currentTimeMillis());
+        long waitTime = (System.currentTimeMillis() - car.getQueueWaitStartTime()) / 1000L;
 
-        System.out.println("Car " + car.getCarId() + " from Gate " + car.getGateId() +
-                    " parked after waiting for " + waitTime +
-                    " units of time. (Parking Status: " + currentCarsInSpots + " spots occupied)");
+        // Log the parking status
+        if (waitTime > 0) {
+            logParkingStatus("Car " + car.getCarId() + " from Gate " + car.getGateId() +
+                    " parked after waiting for " + waitTime + " units of time.");
+        } else {
+            logParkingStatus("Car " + car.getCarId() + " from Gate " + car.getGateId() + " parked.");
+        }
 
-
+        // Set the parking start time
+        car.setParkingStartTime(System.currentTimeMillis());
     }
 
-    public void leave(CarThread car)  {
-            long parkDuration = (System.currentTimeMillis() - car.getParkingTime()) / 1000L;
-            synchronized (this) {
-                currentCarsInSpots--;
-        currentCarsInSpots--;
+    public void leave(CarThread car) {
+        // Decrease the number of cars in spots
+        currentCarsInSpots.decrementAndGet();
 
-        System.out.println("Car " + car.getCarId() + " from Gate " + car.getGateId() + " left after " + parkDuration +
-                        " units of time. (Parking Status: " + currentCarsInSpots + " spots occupied)");
-                semaphoreSpots.release();
-            }
+        long parkedDuration = (System.currentTimeMillis() - car.getParkingStartTime()) / 1000L;
+
+        // Log the leaving status
+        logParkingStatus("Car " + car.getCarId() + " from Gate " + car.getGateId() +
+                " left after " + parkedDuration + " units of time.");
+
+        // Release the parking spot
+        semaphoreSpots.release();
     }
-
-
 }
