@@ -9,6 +9,8 @@ public class CarThread extends Thread{
 
     private long parkingTime;
     private long arriveTimeMillis;
+    private long queueWaitStart;
+
     // Constructor
     public CarThread(int gateId, int carId, int arriveTime, int durationTime, ParkingSystem parkingSystem) {
         this.carId = carId;
@@ -30,8 +32,9 @@ public class CarThread extends Thread{
         return parkingTime;
     }
 
-    public long getArriveTimeMillis() {
-        return arriveTimeMillis  ;
+
+    public long getQueueWaitStart() {
+        return queueWaitStart;
     }
 
 
@@ -51,9 +54,16 @@ public class CarThread extends Thread{
 
                 Thread.sleep(waitTime);
             }
+            System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arriveTime);
+            // Record when the car starts waiting in the queue
+            this.queueWaitStart = System.currentTimeMillis();
+            // Add to the queue
+//            ParkingSystem.queue.add(this);
             boolean f =false;
             synchronized (parkingSystem) {
                 System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arriveTime);
+
+                this.queueWaitStart = System.currentTimeMillis();
                 ParkingSystem.queue.add(this);
                 if (parkingSystem.isFull()) {
                     System.out.println("Car " + carId + " from Gate " + gateId + " waiting for a spot.");
@@ -67,6 +77,27 @@ public class CarThread extends Thread{
     Thread.sleep(durationTime * 1000L);
 
         parkingSystem.leave(this);
+
+
+                // Wait if parking is full
+                while (parkingSystem.isFull()) {
+                    System.out.println("Car " + carId + " from Gate " + gateId + " waiting for a spot.");
+                    parkingSystem.wait();
+                }
+                // Park the car
+                parkingSystem.park(this);
+                parkingTime = System.currentTimeMillis();
+            }
+
+            // Car stays parked for the specified duration
+            Thread.sleep(durationTime * 1000L);
+
+            // Car leaves the parking
+            synchronized (parkingSystem) {
+                parkingSystem.leave(this);
+//                System.out.println("Car " + carId + " left the parking.");
+                parkingSystem.notifyAll();
+            }
 
 
         } catch (InterruptedException e) {
