@@ -6,13 +6,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ParkingSystem {
 
     private final int spots;
-    private final Semaphore semaphoreSpots;
+    private final implementSemaphore semaphoreSpots;
     public static final BlockingQueue<CarThread> queue = new LinkedBlockingQueue<>();
     private final AtomicInteger currentCarsInSpots = new AtomicInteger(0);
 
     public ParkingSystem(int spots) {
         this.spots = spots;
-        this.semaphoreSpots = new Semaphore(spots, true);
+        this.semaphoreSpots = new implementSemaphore(spots);
     }
 
     public int getCurrentCars() {

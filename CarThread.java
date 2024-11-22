@@ -44,7 +44,7 @@ public class CarThread extends Thread {
             Thread.sleep(arrivalTime * 1000L);
             System.out.println("Car " + carId + " from Gate " + gateId + " arrived at time " + arrivalTime);
 
-            // Record queue wait start time
+            // Record the actual queue wait start time after arrival
             queueWaitStartTime = System.currentTimeMillis();
 
             // Add car to the queue
@@ -53,12 +53,6 @@ public class CarThread extends Thread {
             // Attempt to park once the car gets a spot
             parkingSystem.park(this);
 
-            // Calculate and log the waiting time
-            waitTime = (System.currentTimeMillis() - queueWaitStartTime) / 1000L;
-            if (waitTime > 0) {
-                System.out.println("Car " + carId + " from Gate " + gateId + " parked after waiting for " +
-                        waitTime + " units of time.");
-            }
 
             // Simulate parking duration
             Thread.sleep(parkingDuration * 1000L);
