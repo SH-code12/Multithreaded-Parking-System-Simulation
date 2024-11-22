@@ -1,11 +1,10 @@
 public class CarThread extends Thread {
     private final int carId;
     private final int gateId;
-    private final int arrivalTime;  // Arrival time in seconds
-    private final int parkingDuration; // Parking duration in seconds
+    private final int arrivalTime;
+    private final int parkingDuration;
     private final ParkingSystem parkingSystem;
 
-    private long waitTime;
     private long queueWaitStartTime;
     private long parkingStartTime;
 
@@ -61,7 +60,7 @@ public class CarThread extends Thread {
             parkingSystem.leave(this);
 
         } catch (InterruptedException e) {
-            System.err.println("Car " + carId + " from Gate " + gateId + " encountered an error.");
+            System.err.println("Car " + carId + " from Gate " + gateId + " case an error.");
             Thread.currentThread().interrupt();
         }
     }

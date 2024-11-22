@@ -15,14 +15,13 @@ public class implementSemaphore {
         }
         permits--;
     }
+    // Release a permit, notifying one waiting thread
+
     public synchronized void release() {
         if (permits < maxPermits) {
             permits++;
             notify();
         }
-    }
-    public int availablePermits(){
-        return permits;
     }
 }
 

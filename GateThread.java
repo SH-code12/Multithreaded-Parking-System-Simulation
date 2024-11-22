@@ -19,7 +19,7 @@ public class GateThread extends Thread {
                 // Wait for all cars to finish
                 car.join();
             } catch (InterruptedException e) {
-                System.err.println("Gate " + car.getGateId() + " encountered an error.");
+                System.err.println("Gate " + car.getGateId() + " case an error.");
                 Thread.currentThread().interrupt();
             }
         }
